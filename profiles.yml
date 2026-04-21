@@ -1,0 +1,15 @@
+loadsmart_dbt:
+  target: "{{ env_var('DBT_TARGET') }}"
+  outputs:
+    dev:
+      type: bigquery
+      method: service-account
+
+      project: "{{ env_var('DBT_PROJECT_ID') }}"
+      dataset: "{{ env_var('DBT_DATASET') }}"
+      threads: 4
+      location: "{{ env_var('DBT_LOCATION', 'US') }}"
+
+      keyfile: "{{ env_var('DBT_KEYFILE') }}"
+
+      timeout_seconds: 300
