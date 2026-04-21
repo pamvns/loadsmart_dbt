@@ -1,0 +1,21 @@
+version: 2
+
+models:
+  - name: dim_carrier
+    description: One row per load with carrier attributes. Join to fct_loads on loadsmart_id.
+    columns:
+      - name: loadsmart_id
+        description: Load identifier (FK to fct_loads).
+        tests:
+          - unique
+          - not_null
+      - name: carrier_nm
+        description: Anonymised carrier identifier.
+      - name: carrier_rating_fl
+        description: Numeric carrier rating; null when not available.
+      - name: is_vip_carrier
+        description: True if the carrier has VIP status.
+      - name: carrier_dropped_us_count
+        description: Number of times this carrier has dropped a Loadsmart load.
+      - name: sourcing_channel
+        description: Channel used to find the carrier (dat_in, carrier_capacity, source_list, or null for direct).
