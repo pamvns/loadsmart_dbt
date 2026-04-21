@@ -1,0 +1,93 @@
+version: 2
+
+models:
+  - name: fct_loads
+    description: >
+      Fact table at load grain — one row per Loadsmart load.
+      Contains all financial metrics, lead-time measures, carrier performance
+      flags, and operational flags. Join to dimension tables in Power BI
+      using loadsmart_id.
+
+      Dimensions:
+        dim_carrier       — carrier attributes
+        dim_shipper       — shipper attributes
+        dim_lane          — origin/destination geography
+        dim_equipment_type — equipment category
+
+    columns:
+      - name: loadsmart_id
+        description: Natural key — Loadsmart load identifier.
+        tests:
+          - unique
+          - not_null
+
+      - name: quote_date
+        description: Date the load was quoted.
+      - name: book_date
+        description: Date the load was booked.
+      - name: pickup_date
+        description: Pickup date.
+      - name: delivery_date
+        description: Delivery date.
+
+      - name: quoted_at
+        description: Full datetime the load was quoted.
+      - name: booked_at
+        description: Full datetime the load was booked.
+      - name: sourced_at
+        description: Full datetime the carrier was sourced.
+      - name: pickup_at
+        description: Full datetime of pickup.
+      - name: delivered_at
+        description: Full datetime of delivery.
+      - name: pickup_appointment_at
+        description: Scheduled pickup appointment datetime.
+      - name: delivery_appointment_at
+        description: Scheduled delivery appointment datetime.
+
+      - name: quote_to_book_days
+        description: Days between quote and booking.
+      - name: book_to_source_days
+        description: Days between booking and carrier sourcing.
+      - name: book_to_pickup_days
+        description: Days between booking and pickup.
+      - name: transit_days
+        description: Days between pickup and delivery.
+
+      - name: book_price
+        description: Revenue charged to the shipper (USD).
+      - name: source_price
+        description: Cost paid to the carrier (USD).
+      - name: pnl
+        description: Gross profit as reported in source.
+      - name: mileage
+        description: Trip distance in miles.
+      - name: book_price_per_mile
+        description: Revenue per mile.
+      - name: source_price_per_mile
+        description: Cost per mile.
+
+      - name: sourcing_channel
+        description: Channel used to source the carrier.
+      - name: is_carrier_on_time_to_pickup
+        description: True if carrier arrived on time for pickup.
+      - name: is_carrier_on_time_to_delivery
+        description: True if carrier delivered on time.
+      - name: is_carrier_on_time_overall
+        description: True if carrier was on time overall.
+
+      - name: has_mobile_app_tracking
+        description: True if load was tracked via mobile app.
+      - name: has_macropoint_tracking
+        description: True if load was tracked via Macropoint.
+      - name: has_edi_tracking
+        description: True if load was tracked via EDI.
+
+      - name: is_contracted_load
+        description: True if load was on a contracted lane.
+      - name: is_booked_autonomously
+        description: True if load was booked without human intervention.
+      - name: is_sourced_autonomously
+        description: True if carrier was sourced without human intervention.
+      - name: was_cancelled
+        description: True if the load was cancelled.

@@ -1,0 +1,13 @@
+version: 2
+
+models:
+  - name: dim_shipper
+    description: One row per load with shipper attributes. Join to fct_loads on loadsmart_id.
+    columns:
+      - name: loadsmart_id
+        description: Load identifier (FK to fct_loads).
+        tests:
+          - unique
+          - not_null
+      - name: shipper_nm
+        description: Anonymised shipper identifier.
