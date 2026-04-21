@@ -1,0 +1,135 @@
+version: 2
+
+models:
+  - name: stg_ae_data
+    description: >
+      Staged load data from the 2026 AE Data Challenge seed.
+      Grain: one row per load (loadsmart_id).
+
+      Responsibilities of this layer:
+        - Cast all columns to their correct data types (dates, booleans, numerics)
+        - Parse the raw `lane` string into origin/destination city and state
+        - Rename columns to a consistent naming convention
+        - Expose nulls (empty strings → NULL for carrier_rating, sourcing_channel)
+
+      This model is the single source of truth feeding the star schema:
+        - dim_carrier        carrier attributes (name, rating, VIP flag, drop count)
+        - dim_shipper        shipper attributes
+        - dim_lane           origin/destination lane pairs
+        - dim_equipment_type equipment category (RFR, DRV)
+        - fct_loads          load-level facts (financial, operational, performance)
+
+      Known data quality issue: the source CSV has the column
+      'has_mobile_app_tracking' listed twice (positions 24 and 25).
+      The second occurrence is dropped in this model; only the first is used.
+
+    columns:
+      - name: loadsmart_id
+        description: Unique load identifier (cast from loadsmart_id).
+        tests:
+          - unique
+          - not_null
+
+      - name: lane
+        description: Raw lane string in "Origin City,ST -> Dest City,ST" format.
+
+      - name: origin_city
+        description: Pickup city, parsed from lane.
+
+      - name: origin_state
+        description: Pickup 2-letter US state code, parsed from lane.
+
+      - name: destination_city
+        description: Delivery city, parsed from lane.
+
+      - name: destination_state
+        description: Delivery 2-letter US state code, parsed from lane.
+
+      - name: quoted_at
+        description: Datetime when the load was quoted.
+
+      - name: booked_at
+        description: Datetime when the load was booked by the shipper.
+
+      - name: sourced_at
+        description: Datetime when a carrier was assigned/sourced.
+
+      - name: pickup_at
+        description: Scheduled or actual pickup datetime.
+
+      - name: delivered_at
+        description: Scheduled or actual delivery datetime.
+
+      - name: pickup_appointment_at
+        description: Pickup appointment datetime agreed with the carrier.
+
+      - name: delivery_appointment_at
+        description: Delivery appointment datetime agreed with the carrier.
+
+      - name: book_price
+        description: Revenue — the price charged to the shipper (USD).
+
+      - name: source_price
+        description: Cost — the price paid to the carrier (USD).
+
+      - name: pnl
+        description: >
+          Gross profit as reported in the source (book_price − source_price).
+          Note: some rows show pnl = 0 even when source_price = 0; treat as
+          source-reported and do not recalculate downstream without context.
+
+      - name: mileage
+        description: Trip distance in miles.
+
+      - name: equipment_type
+        description: Equipment category code used for the load (e.g. RFR, DRV). Check dim_equipment_type for all values present in the data.
+
+      - name: carrier_nm
+        description: Anonymised carrier identifier (e.g. "Carrier 605817"). Null for some records in the source.
+
+      - name: carrier_rating
+        description: Numeric carrier performance rating; null when not provided.
+
+      - name: is_vip_carrier
+        description: Whether the carrier holds VIP status with Loadsmart.
+
+      - name: carrier_dropped_us_count
+        description: Number of times this carrier has dropped a Loadsmart load.
+
+      - name: sourcing_channel
+        description: >
+          Channel used to find the carrier (e.g. dat_in, carrier_capacity,
+          source_list). Null means the carrier was sourced directly.
+
+      - name: shipper_nm
+        description: Anonymised shipper identifier (e.g. "Shipper 758").
+
+      - name: is_carrier_on_time_to_pickup
+        description: True if the carrier arrived on time for pickup.
+
+      - name: is_carrier_on_time_to_delivery
+        description: True if the carrier completed delivery on time.
+
+      - name: is_carrier_on_time_overall
+        description: True if the carrier was on time for both pickup and delivery.
+
+      - name: has_mobile_app_tracking
+        description: True if the load was tracked via the Loadsmart mobile app.
+
+      - name: has_macropoint_tracking
+        description: True if the load was tracked via Macropoint.
+
+      - name: has_edi_tracking
+        description: True if the load was tracked via EDI.
+
+      - name: is_contracted_load
+        description: True if the load was on a pre-contracted lane/rate.
+
+      - name: is_booked_autonomously
+        description: True if the load was booked without human intervention.
+
+      - name: is_sourced_autonomously
+        description: True if the carrier was sourced without human intervention.
+
+      - name: was_cancelled
+        description: True if the load was cancelled before completion.
