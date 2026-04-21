@@ -1,0 +1,23 @@
+version: 2
+
+models:
+  - name: dim_lane
+    description: One row per load with lane/geography attributes. Join to fct_loads on loadsmart_id.
+    columns:
+      - name: loadsmart_id
+        description: Load identifier (FK to fct_loads).
+        tests:
+          - unique
+          - not_null
+      - name: lane
+        description: Raw lane string, e.g. "Hood River,OR -> Upper Marlboro,MD".
+      - name: origin_city
+        description: Pickup city.
+      - name: origin_state
+        description: Pickup 2-letter US state code.
+      - name: destination_city
+        description: Delivery city.
+      - name: destination_state
+        description: Delivery 2-letter US state code.
+      - name: state_lane
+        description: Abbreviated lane, e.g. "OR -> MD". Useful for grouping.

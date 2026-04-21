@@ -1,0 +1,111 @@
+version: 2
+
+seeds:
+  - name: 2026_data_challenge_ae_data
+    description: >
+      Raw load data export for the 2026 AE Data Challenge.
+      One row per load with pricing, carrier, shipper, lane,
+      and operational attributes.
+
+      Known data quality issue: the column 'has_mobile_app_tracking' appears
+      twice in the CSV header (positions 24 and 25). The second occurrence is
+      a duplicate and carries no distinct signal (all values are FALSE).
+      The staging model stg_ae_data uses only the first occurrence.
+
+    columns:
+      - name: loadsmart_id
+        description: >
+          Load identifier. Should be unique but the source data contains
+          4 duplicate IDs — deduplication is applied in stg_ae_data.
+        tests:
+          - not_null
+
+      - name: lane
+        description: Origin and destination in "City,ST -> City,ST" format.
+
+      - name: quote_date
+        description: Load quote timestamp (string, M/D/YYYY H:MM format).
+
+      - name: book_date
+        description: Load booking timestamp (string, M/D/YYYY H:MM format).
+
+      - name: source_date
+        description: Carrier sourcing timestamp (string, M/D/YYYY H:MM format).
+
+      - name: pickup_date
+        description: Pickup datetime (string, M/D/YYYY H:MM format).
+
+      - name: delivery_date
+        description: Delivery datetime (string, M/D/YYYY H:MM format).
+
+      - name: book_price
+        description: Shipper-facing price (revenue, USD).
+
+      - name: source_price
+        description: Carrier-facing price (cost, USD).
+
+      - name: pnl
+        description: Gross profit reported in source (book_price − source_price).
+
+      - name: mileage
+        description: Load distance in miles.
+
+      - name: equipment_type
+        description: "Equipment type code: RFR (Reefer) or DRV (Dry Van)."
+
+      - name: carrier_rating
+        description: Numeric carrier performance rating; sparsely populated.
+
+      - name: sourcing_channel
+        description: Channel through which the carrier was found (dat_in, carrier_capacity, source_list, or empty for direct).
+
+      - name: vip_carrier
+        description: Boolean string — TRUE if carrier has VIP status.
+
+      - name: carrier_dropped_us_count
+        description: Number of times this carrier has dropped a Loadsmart load.
+
+      - name: carrier_nm
+        description: Anonymised carrier identifier (e.g. "Carrier 605817").
+
+      - name: shipper_nm
+        description: Anonymised shipper identifier (e.g. "Shipper 758").
+
+      - name: carrier_on_time_to_pickup
+        description: Boolean string — TRUE if carrier was on time at pickup.
+
+      - name: carrier_on_time_to_delivery
+        description: Boolean string — TRUE if carrier delivered on time.
+
+      - name: carrier_on_time_overall
+        description: Boolean string — TRUE if carrier was on time overall.
+
+      - name: pickup_appointment_time
+        description: Scheduled pickup appointment (string, M/D/YYYY H:MM format).
+
+      - name: delivery_appointment_time
+        description: Scheduled delivery appointment (string, M/D/YYYY H:MM format).
+
+      - name: has_mobile_app_tracking
+        description: >
+          Boolean string — TRUE if load was tracked via mobile app.
+          WARNING: this column name is duplicated in the source CSV (appears at
+          positions 24 and 25). Only the first occurrence is meaningful.
+
+      - name: has_macropoint_tracking
+        description: Boolean string — TRUE if load was tracked via Macropoint.
+
+      - name: has_edi_tracking
+        description: Boolean string — TRUE if load was tracked via EDI.
+
+      - name: contracted_load
+        description: Boolean string — TRUE if load is on a contracted lane.
+
+      - name: load_booked_autonomously
+        description: Boolean string — TRUE if load was booked without human intervention.
+
+      - name: load_sourced_autonomously
+        description: Boolean string — TRUE if carrier was sourced without human intervention.
+
+      - name: load_was_cancelled
+        description: Boolean string — TRUE if the load was cancelled.
